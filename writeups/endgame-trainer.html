@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Endgame Trainer: Client-Side Checkmate Bypass — Case File — Trent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-brand">trent<span>@</span>secops</div>
+    <ul class="nav-links">
+      <li><a href="../index.html#capabilities">Capabilities</a></li>
+      <li><a href="../index.html#cases">Case Files</a></li>
+      <li><a href="../index.html#path">Certification Path</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="writeup-header">
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+    <div class="ticket-bar" style="margin-top:18px;">
+      <span class="ticket-id">CASE-02</span>
+      <span class="status-badge status-resolved">Resolved</span>
+      <span>Web Exploitation / Client-Side Bypass</span>
+    </div>
+    <h1>Endgame Trainer: Client-Side Checkmate Bypass</h1>
+    <div class="writeup-meta-grid">
+      <span><strong>Room</strong> TryHackMe — Endgame Trainer</span>
+    </div>
+    <div class="case-tags">
+      <span class="tag">JavaScript</span>
+        <span class="tag">API Abuse</span>
+        <span class="tag">Web Exploitation</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <article class="writeup-body">
+<h2>Objective</h2>
+<p>A web-based "chess endgame trainer" presents a mate-in-one puzzle, but blocks the winning move client-side with a fake threatening popup. Bypass the client-side restriction and retrieve the flag from the server.</p>
+<h2>The Setup</h2>
+<p>The app is a chess trainer starting from the position:</p>
+<pre><code>6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1
+</code></pre>
+<p>White to move, with an obvious mate-in-one: <strong>Ra8#</strong> (rook from a1 to a8 — back-rank mate, since Black's king is boxed in by its own f7/g7/h7 pawns).</p>
+<p>Attempting to play this move in the UI triggered a fake Windows-style error dialog:</p>
+<blockquote>
+<p>"I'll shut down your PC if you play that."</p>
+</blockquote>
+<p>This is purely a scare tactic rendered in HTML/CSS/JS — it has no actual capability to affect the user's system.</p>
+<h2>Source Review</h2>
+<p>Reviewing <code>js/app.js</code> revealed the actual mechanism behind the block, in a function called before any move is sent to the server:</p>
+<pre><code class="language-javascript">function preMoveCheck(from, to, promotion) {
+  const probe = new Chess(game.fen());
+  let result;
+  try {
+    result = probe.move({ from, to, promotion: promotion || undefined });
+  } catch (e) {
+    result = null;
+  }
+  if (result &amp;&amp; probe.isCheckmate()) {
+    showSystemNotice(&quot;I'll shut down your PC if you play that.&quot;);
+    return false;
+  }
+  return true;
+}
+</code></pre>
+<p>Key takeaway: the app simulates every candidate move locally, on a throwaway copy of the board (<code>probe</code>), <strong>before</strong> sending anything to the server. If the simulated move results in checkmate, it shows the fake warning and returns <code>false</code>, which stops <code>doMove()</code> from ever calling <code>sendMove()</code>. In other words:</p>
+<p><strong>The checkmate-blocking logic exists entirely in client-side JavaScript that the user fully controls.</strong></p>
+<p>The move validation and flag-issuing logic, by contrast, live server-side behind <code>/api/move</code> — a call the client makes with <code>fetch()</code> once <code>preMoveCheck</code> approves it.</p>
+<h2>Exploitation</h2>
+<p>Since the restriction never reaches the server, it can be bypassed by calling the API directly from the browser's DevTools console, skipping the UI (and <code>preMoveCheck</code>) entirely:</p>
+<pre><code class="language-javascript">fetch('/api/move', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ from: 'a1', to: 'a8' })
+}).then(r =&gt; r.json()).then(console.log)
+</code></pre>
+<p>Note: if the server-side game state has drifted from the intended starting position (e.g., from earlier testing), reset first:</p>
+<pre><code class="language-javascript">fetch('/api/reset', { method: 'POST' }).then(r =&gt; r.json()).then(console.log)
+</code></pre>
+<p>Then resend the mating move. The server validated the checkmate and returned the flag in the JSON response.</p>
+<h2>Result</h2>
+<p><strong>Flag:</strong></p>
+<pre><code>THM{cl13nt_s1d3_ch3ckm4t3}
+</code></pre>
+<h2>Takeaway</h2>
+<p>This challenge is a clean illustration of a fundamental web security principle: <strong>never trust client-side validation for anything security- or logic-critical.</strong> The client is fully under the user's control — any check, restriction, or "gate" implemented only in JavaScript running in the browser can be inspected, understood, and bypassed by simply calling the underlying API directly. Legitimate authorization and game-state logic must be enforced server-side, which — fittingly — is exactly where this app's actual checkmate detection and flag issuance lived.</p>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+  </div>
+</footer>
+
+</body>
+</html>

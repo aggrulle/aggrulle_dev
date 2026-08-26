@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNS Enumeration Challenge — Case File — Trent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-brand">trent<span>@</span>secops</div>
+    <ul class="nav-links">
+      <li><a href="../index.html#capabilities">Capabilities</a></li>
+      <li><a href="../index.html#cases">Case Files</a></li>
+      <li><a href="../index.html#path">Certification Path</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="writeup-header">
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+    <div class="ticket-bar" style="margin-top:18px;">
+      <span class="ticket-id">CASE-01</span>
+      <span class="status-badge status-resolved">Resolved</span>
+      <span>DNS / Enumeration</span>
+    </div>
+    <h1>DNS Enumeration Challenge</h1>
+    <div class="writeup-meta-grid">
+      <span><strong>Room</strong> TryHackMe — DNS Enumeration</span>
+    </div>
+    <div class="case-tags">
+      <span class="tag">DNS</span>
+        <span class="tag">dig</span>
+        <span class="tag">Enumeration</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <article class="writeup-body">
+<h2>Objective</h2>
+<p>Enumerate a misconfigured/custom DNS server at <code>10.65.185.133</code> to retrieve a flag associated with the domain <code>givemetheflag.com</code>.</p>
+<h2>Recon</h2>
+<p>An <code>nmap</code> scan of the target showed only one open port:</p>
+<pre><code>22/tcp   open  ssh
+</code></pre>
+<p>No port 53 was flagged by default nmap service detection in a way that gave anything away — the box doesn't advertise itself as a DNS server through standard scanning, and SSH was a red herring / not the intended path.</p>
+<h2>Enumeration</h2>
+<p>Since the task hinted the server only responds to specific DNS queries for <code>givemetheflag.com</code>, the natural tool is <code>dig</code>, pointed directly at the target as the resolver:</p>
+<pre><code class="language-bash">dig @10.65.185.133 givemetheflag.com
+</code></pre>
+<p>Breaking that command down:
+- <code>@10.65.185.133</code> — tells <code>dig</code> to query this IP directly as the DNS server, rather than using the system's default resolver
+- <code>givemetheflag.com</code> — the domain being queried
+- (no record type specified) — defaults to an <strong>A record</strong> lookup</p>
+<h2>Result</h2>
+<p>The very first query returned the flag directly in the ANSWER SECTION of the response — no need for zone transfers or record-type enumeration. The server had been configured so its "answer" to a basic A-record query for that domain literally <em>was</em> the flag data.</p>
+<p><strong>Flag:</strong></p>
+<pre><code>flag{0767ccd06e79853318f25aeb08ff83e2}
+</code></pre>
+<h2>Takeaway</h2>
+<p>This challenge illustrates a very simple point about DNS: <strong>DNS responses aren't just IP addresses</strong> — a DNS server can be configured to return arbitrary data in a record's answer field. Basic enumeration with <code>dig</code> is often the fastest path to spot a misconfigured or intentionally "creative" DNS server, and you don't always need advanced techniques (AXFR, brute-forcing subdomains, etc.) — sometimes the simplest query is the answer.</p>
+<h2>Command Used</h2>
+<pre><code class="language-bash">dig @10.65.185.133 givemetheflag.com
+</code></pre>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+  </div>
+</footer>
+
+</body>
+</html>

