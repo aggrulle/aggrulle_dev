@@ -3,94 +3,209 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>All Case Files — Trent</title>
+<title>Trent — Cybersecurity Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
 <nav>
-  <div class="wrap-wide">
+  <div class="wrap">
     <div class="nav-brand">trent<span>@</span>secops</div>
     <ul class="nav-links">
-      <li><a href="../index.html#capabilities">Capabilities</a></li>
-      <li><a href="../index.html#cases">Case Files</a></li>
-      <li><a href="../index.html#path">Certification Path</a></li>
-      <li><a href="../index.html#contact">Contact</a></li>
+      <li><a href="#capabilities">Capabilities</a></li>
+      <li><a href="#cases">Case Files</a></li>
+      <li><a href="#path">Certification Path</a></li>
+      <li><a href="#contact">Contact</a></li>
     </ul>
   </div>
 </nav>
 
-<header class="writeup-header">
-  <div class="wrap-wide">
-    <a class="back-link" href="../index.html">&larr; Back to home</a>
-    <div class="ticket-bar" style="margin-top:18px;">
-      <span class="ticket-id">#0003</span>
-      <span class="status-badge status-resolved">Archive</span>
-      <span>All Case Files</span>
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-panel">
+      <div class="hero-meta">
+        <span><strong>Ticket</strong> #0001</span>
+        <span><strong>Priority</strong> High</span>
+        <span><strong>Status</strong> Open</span>
+        <span><strong>Assigned</strong> Recruiter (you)</span>
+      </div>
+      <h1>Trent [Last Name]</h1>
+      <div class="role">Cybersecurity Student &amp; Aspiring SOC Analyst</div>
+      <p class="summary">
+        Rising senior studying Cybersecurity at the University of South Florida, working toward
+        Security+ certification, with hands-on reverse engineering and malware analysis experience
+        through USF's WhiteHatters Computer Security Club. Building a home lab in Microsoft Sentinel,
+        Defender XDR, and KQL to bridge classroom fundamentals with real SOC tooling.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#cases">View case files</a>
+        <a class="btn" href="/resume.pdf">Download resume</a>
+        <a class="btn" href="mailto:your.email@example.com">Contact</a>
+      </div>
     </div>
-    <h1>Case File Archive</h1>
   </div>
 </header>
 
-<section style="border-top:none; padding-top:0;">
-  <div class="wrap-wide">
-    <div class="case-grid">
-      <a class="case" href="relevant.html">
-        <div class="case-eyebrow">CASE-05 &middot; Resolved</div>
-        <div class="case-top"><h3>Relevant</h3></div>
-        <p>SMB Exploitation / Windows Server / Privilege Escalation</p>
-        <div class="case-tags"><span class="tag">SMB</span>
-        <span class="tag">Windows Server</span>
-        <span class="tag">PrintSpoofer</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
-      </a>
-
-      <a class="case" href="pickle-rick.html">
-        <div class="case-eyebrow">CASE-04 &middot; Resolved</div>
-        <div class="case-top"><h3>Pickle Rick</h3></div>
-        <p>Web Exploitation / Linux Privilege Escalation</p>
-        <div class="case-tags"><span class="tag">Web Exploitation</span>
-        <span class="tag">Filter Bypass</span>
-        <span class="tag">sudo PrivEsc</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
-      </a>
-
-      <a class="case" href="mr-robot.html">
-        <div class="case-eyebrow">CASE-03 &middot; Resolved</div>
-        <div class="case-top"><h3>Mr. Robot CTF</h3></div>
-        <p>Web Exploitation / WordPress / Password Cracking / Linux PrivEsc</p>
-        <div class="case-tags"><span class="tag">WordPress</span>
-        <span class="tag">Password Cracking</span>
-        <span class="tag">SUID PrivEsc</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
-      </a>
-
-      <a class="case" href="endgame-trainer.html">
-        <div class="case-eyebrow">CASE-02 &middot; Resolved</div>
-        <div class="case-top"><h3>Endgame Trainer: Client-Side Checkmate Bypass</h3></div>
-        <p>Web Exploitation / Client-Side Bypass</p>
-        <div class="case-tags"><span class="tag">JavaScript</span>
-        <span class="tag">API Abuse</span>
-        <span class="tag">Web Exploitation</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
-      </a>
-
-      <a class="case" href="dns-enumeration.html">
-        <div class="case-eyebrow">CASE-01 &middot; Resolved</div>
-        <div class="case-top"><h3>DNS Enumeration Challenge</h3></div>
-        <p>DNS / Enumeration</p>
-        <div class="case-tags"><span class="tag">DNS</span>
-        <span class="tag">dig</span>
-        <span class="tag">Enumeration</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
-      </a>
-
+<section id="capabilities">
+  <div class="wrap">
+    <div class="ticket-bar">
+      <span class="ticket-id">#0002</span>
+      <span class="status-badge status-progress">Reference</span>
+      <span>System Capabilities Inventory</span>
+    </div>
+    <div class="section-head">
+      <h2>Capabilities</h2>
+      <p>Skills and tools, organized the way a SOC would inventory them — not a decorative skill cloud.</p>
+    </div>
+    <div class="cap-grid">
+      <div class="cap-card">
+        <div class="field">Detection &amp; SIEM</div>
+        <h3>Microsoft Sentinel / Defender XDR</h3>
+        <p>Home-lab build using Azure free tier; analytics rules, incident triage, KQL queries.</p>
+      </div>
+      <div class="cap-card">
+        <div class="field">Query Language</div>
+        <h3>KQL</h3>
+        <p>Log Analytics and Sentinel query writing — auth failures, process creation, network events.</p>
+      </div>
+      <div class="cap-card">
+        <div class="field">Reverse Engineering</div>
+        <h3>Ghidra</h3>
+        <p>Binary analysis for CTF challenges — extracting credentials and unlocking protected files.</p>
+      </div>
+      <div class="cap-card">
+        <div class="field">Malware Analysis</div>
+        <h3>Static / Dynamic Analysis</h3>
+        <p>Lab work on DLL hijacking and credential theft techniques (GINA-based case study).</p>
+      </div>
+      <div class="cap-card">
+        <div class="field">Hardening</div>
+        <h3>DISA STIGs / VMware</h3>
+        <p>Windows hardening portfolio project applying DoD security technical implementation guides.</p>
+      </div>
+      <div class="cap-card">
+        <div class="field">Scripting</div>
+        <h3>Python / PowerShell</h3>
+        <p>Small automations for log parsing, IOC enrichment, and operational tooling.</p>
+      </div>
     </div>
   </div>
 </section>
+
+<section id="cases">
+  <div class="wrap">
+    <div class="ticket-bar">
+      <span class="ticket-id">#0003</span>
+      <span class="status-badge status-resolved">Resolved</span>
+      <span>Recent Case Files</span>
+    </div>
+    <div class="section-head">
+      <h2>Case Files</h2>
+      <p>The three most recent CTF write-ups. Each one is a full room walkthrough on its own page.</p>
+    </div>
+
+    <div class="case-grid case-grid-row">
+      <a class="case" href="writeups/relevant.html">
+        <div class="case-eyebrow">CASE-05 &middot; Resolved</div>
+        <div class="case-top"><h3>Relevant</h3></div>
+        <p>SMB Exploitation / Windows Server / Privilege Escalation</p>
+        <div class="case-tags">
+          <span class="tag">SMB</span>
+          <span class="tag">Windows Server</span>
+          <span class="tag">PrintSpoofer</span>
+        </div>
+        <div class="case-cta">Read write-up →</div>
+      </a>
+
+      <a class="case" href="writeups/pickle-rick.html">
+        <div class="case-eyebrow">CASE-04 &middot; Resolved</div>
+        <div class="case-top"><h3>Pickle Rick</h3></div>
+        <p>Web Exploitation / Linux Privilege Escalation</p>
+        <div class="case-tags">
+          <span class="tag">Web Exploitation</span>
+          <span class="tag">Filter Bypass</span>
+          <span class="tag">sudo PrivEsc</span>
+        </div>
+        <div class="case-cta">Read write-up →</div>
+      </a>
+
+      <a class="case" href="writeups/mr-robot.html">
+        <div class="case-eyebrow">CASE-03 &middot; Resolved</div>
+        <div class="case-top"><h3>Mr. Robot CTF</h3></div>
+        <p>WordPress / Password Cracking / Linux PrivEsc</p>
+        <div class="case-tags">
+          <span class="tag">WordPress</span>
+          <span class="tag">Password Cracking</span>
+          <span class="tag">SUID PrivEsc</span>
+        </div>
+        <div class="case-cta">Read write-up →</div>
+      </a>
+    </div>
+
+    <div class="section-footer-action">
+      <a class="btn" href="writeups/index.html">View all case files</a>
+    </div>
+  </div>
+</section>
+
+<section id="path">
+  <div class="wrap">
+    <div class="ticket-bar">
+      <span class="ticket-id">#0004</span>
+      <span class="status-badge status-progress">In Progress</span>
+      <span>Certification &amp; Education Timeline</span>
+    </div>
+    <div class="section-head">
+      <h2>Certification Path</h2>
+    </div>
+    <div class="timeline">
+      <div class="tl-item done">
+        <div class="tl-label">Held</div>
+        <h3>Rapid7 InsightAppSec Certified Specialist</h3>
+        <p>Application security scanning specialist certification.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-label">In Progress</div>
+        <h3>CompTIA Security+</h3>
+        <p>Following a structured 6-week study plan alongside coursework and work schedule.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-label">Planned Next</div>
+        <h3>BTL1 or eJPT</h3>
+        <p>Hands-on practitioner-level certification, chosen based on which fits the target role better.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-label">Expected</div>
+        <h3>B.S. Cybersecurity — University of South Florida</h3>
+        <p>Coursework spanning security operations, networks, HCI security, and applied labs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="ticket-bar" style="margin-bottom:20px;">
+      <span class="ticket-id">#0005</span>
+      <span class="status-badge status-open">Open</span>
+      <span>Contact</span>
+    </div>
+    <div class="contact-panel">
+      <p style="max-width:40ch; color:var(--text-dim);">
+        Open to SOC analyst, cybersecurity operations, and entry-level security roles.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:your.email@example.com">Email</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">GitHub</a>
+      </div>
+    </div>
+    <p class="foot-note">// last updated 2026-07-21</p>
+  </div>
+</footer>
 
 </body>
 </html>
