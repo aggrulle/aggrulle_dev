@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Lab: Sentinel + KQL Detection Engineering — Case File — Trent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-brand">trent<span>@</span>secops</div>
+    <ul class="nav-links">
+      <li><a href="../index.html#capabilities">Capabilities</a></li>
+      <li><a href="../index.html#cases">Case Files</a></li>
+      <li><a href="../index.html#path">Certification Path</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="writeup-header">
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+    <div class="ticket-bar" style="margin-top:18px;">
+      <span class="ticket-id">CASE-06</span>
+      <span class="status-badge status-resolved">Resolved</span>
+      <span>SIEM / Detection Engineering / Blue Team</span>
+    </div>
+    <h1>Home Lab: Sentinel + KQL Detection Engineering</h1>
+    <div class="writeup-meta-grid">
+      <span><strong>Room</strong> Personal Home Lab — Microsoft Azure</span>
+    </div>
+    <div class="case-tags">
+      <span class="tag">Sentinel</span>
+        <span class="tag">KQL</span>
+        <span class="tag">Detection Engineering</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <article class="writeup-body">
+<p><strong>Category:</strong> SIEM / Detection Engineering / Blue Team
+<strong>Environment:</strong> Azure (free tier) — Log Analytics workspace, Microsoft Sentinel, Windows Server VM
+<strong>Objective:</strong> Build a working SOC detection pipeline from scratch — ingest real telemetry, write detection logic in KQL, simulate an attack technique, and confirm the full alert-to-incident workflow — then surface it in a dashboard.</p>
+<hr />
+<h2>1. Environment Setup</h2>
+<p>Built the lab entirely on Azure's free tier:</p>
+<ul>
+<li><strong>Log Analytics workspace</strong> (<code>use-secops-lab</code>) — the central data store for all ingested logs</li>
+<li><strong>Microsoft Sentinel</strong> enabled on top of that workspace</li>
+<li><strong>Windows Server VM</strong> (<code>WinServer-Test-</code>) deployed as the monitored endpoint</li>
+<li><strong>Data Collection Rule</strong> using the "Windows Security Events via AMA" connector, installing the Azure Monitor Agent on the VM and streaming Windows Security event logs into the workspace</li>
+</ul>
+<p>Kept cost low by stopping/deallocating the VM whenever it wasn't actively being used — Sentinel, the workspace, and all ingested data stay intact and cost nothing extra while the VM is off.</p>
+<h2>2. Confirming Ingestion</h2>
+<p>Before building any detections, first confirmed logs were actually flowing by running a baseline query in Sentinel's Logs blade:</p>
+<pre><code class="language-kql">SecurityEvent
+| take 10
+</code></pre>
+<p><img alt="First KQL query confirming SecurityEvent log ingestion" src="img/sentinel-lab/01-first-kql-query.png" /></p>
+<p>Getting rows back here confirmed the full pipeline — VM → Azure Monitor Agent → Data Collection Rule → Log Analytics workspace — was working end to end before writing any actual detection logic.</p>
+<h2>3. Simulating an Attack Technique</h2>
+<p>Rather than manually creating test data, used <strong>Invoke-AtomicRedTeam</strong> (Red Canary's open-source attack simulation framework, mapped to MITRE ATT&amp;CK) to generate a realistic, repeatable event on the VM.</p>
+<p>Ran <strong>T1136.001 — Create Local Account</strong>, a common persistence technique:</p>
+<pre><code class="language-powershell">Set-ExecutionPolicy Bypass -Scope Process -Force
+Import-Module &quot;C:\AtomicRedTeam\invoke-atomicredteam\Invoke-AtomicRedTeam.psd1&quot; -Force
+Invoke-AtomicTest T1136.001
+</code></pre>
+<p><img alt="Atomic Red Team executing T1136.001 sub-tests, creating local accounts via CMD, PowerShell, and .NET" src="img/sentinel-lab/02-atomic-test-execution.png" /></p>
+<p>This single technique runs through several sub-tests — creating a local user via <code>cmd</code>, PowerShell, and as a Windows admin — each one generating a genuine <strong>Event ID 4720</strong> (a new local account was created) on the VM, exactly as a real attacker establishing persistence would.</p>
+<h2>4. Writing the Detection Query</h2>
+<p>With real 4720 events now landing in <code>SecurityEvent</code>, wrote a KQL query to surface them cleanly:</p>
+<pre><code class="language-kql">SecurityEvent
+| where EventID == 4720
+| project TimeGenerated, TargetUserName, SubjectUserName, Computer
+</code></pre>
+<p><img alt="KQL query confirming EventID 4720 account-creation events from the atomic test" src="img/sentinel-lab/03-atomic-test-kql-verification.png" /></p>
+<p>The results show each account created during the atomic test run (<code>NewLocalUser</code>, <code>T1136.001_Admin</code>, <code>T1136.001_PowerShell</code>, <code>T1136.001_CMD</code>) — proof the detection logic correctly isolates the exact behavior the attack simulation produced.</p>
+<h2>5. Building the Analytics Rule</h2>
+<p>Converted the manual query into an automated <strong>Scheduled Query Rule</strong> in Sentinel Analytics:</p>
+<ul>
+<li><strong>Name:</strong> <code>NewLocalAcctCreation</code></li>
+<li><strong>Severity:</strong> Medium</li>
+<li><strong>Query:</strong> the EventID 4720 query above</li>
+<li><strong>Entity mapping:</strong> <code>TargetUserName</code> → Account, <code>Computer</code> → Host (so incidents show proper context in the investigation graph)</li>
+<li><strong>Schedule:</strong> every 5 minutes, looking back over the last 5 minutes</li>
+<li><strong>Threshold:</strong> trigger when results &gt; 0</li>
+<li><strong>Incident creation:</strong> enabled</li>
+</ul>
+<h2>6. Confirming the Full Alert-to-Incident Pipeline</h2>
+<p>Re-ran the atomic test to generate fresh account-creation events, and within one scheduling cycle, Sentinel correctly fired the rule and generated incidents:</p>
+<p><img alt="Four Medium-severity NewLocalAcctCreation incidents generated in Sentinel" src="img/sentinel-lab/04-incidents-triggered.png" /></p>
+<p>Each atomic sub-test that created an account produced its own incident — confirming the detection isn't just matching historical data, but actively catching new activity as it happens, the same way a production SOC rule would.</p>
+<h2>7. Building the Detection Overview Workbook</h2>
+<p>Finally, built a Sentinel Workbook to visualize the lab's activity in one place — table volumes by type, incident status breakdown, and a running count of new incidents:</p>
+<p><img alt="SecOps Lab Detection Overview workbook showing table volumes and incident status" src="img/sentinel-lab/05-detection-overview-workbook.png" /></p>
+<p>This turns raw detection data into something a SOC lead or stakeholder could actually glance at — which is as much a part of the job as writing the detection logic itself.</p>
+<hr />
+<h2>Key Takeaways</h2>
+<ul>
+<li><strong>Building the pipeline is half the job</strong> — a detection rule is only as good as the ingestion path behind it. Verifying data at each stage (agent installed → DCR active → raw query returns rows → detection query isolates the right events) catches problems early instead of debugging a "silent" rule later.</li>
+<li><strong>Attack simulation tools like Atomic Red Team make detection engineering testable.</strong> Rather than guessing whether a rule "should" work, you can generate the exact technique it's meant to catch and verify it end-to-end — the same validation loop real detection engineers use before shipping a rule to production.</li>
+<li><strong>KQL scheduling windows matter.</strong> A rule's lookback period has to realistically cover the gap between scheduled runs, or genuine detections can be missed simply due to timing — a good reminder that tuning a rule doesn't stop once the query logic is "correct."</li>
+<li><strong>Dashboards close the loop.</strong> A detection that only a query author can see doesn't help a team. A workbook turns individual incidents and log volumes into a shared, at-a-glance view of what's actually happening in the environment.</li>
+</ul>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to all case files</a>
+  </div>
+</footer>
+
+</body>
+</html>
