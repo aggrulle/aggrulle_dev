@@ -3,99 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>All Case Files — Trent</title>
+<title>All Write-Ups — Trent Barber</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 
-<nav>
-  <div class="wrap-wide">
-    <div class="nav-brand">trent<span>@</span>secops</div>
-    <ul class="nav-links">
-      <li><a href="../index.html#capabilities">Capabilities</a></li>
-      <li><a href="../index.html#cases">Case Files</a></li>
-      <li><a href="../index.html#path">Certification Path</a></li>
-      <li><a href="../index.html#contact">Contact</a></li>
-    </ul>
-  </div>
-</nav>
-
-<header class="writeup-header">
-  <div class="wrap-wide">
-    <a class="back-link" href="../index.html">&larr; Back to home</a>
-    <div class="ticket-bar" style="margin-top:18px;">
-      <span class="ticket-id">#0003</span>
-      <span class="status-badge status-resolved">Archive</span>
-      <span>All Case Files</span>
+<header class="band-dark">
+  <nav>
+    <div class="container-wide">
+      <div class="wordmark">Trent Barber</div>
+      <ul class="nav-links">
+        <li><a href="../index.html#work">Write-Ups</a></li>
+        <li><a href="../index.html#background">Background</a></li>
+        <li><a href="../index.html#path">Certification Path</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
     </div>
-    <h1>Case File Archive</h1>
+  </nav>
+  <div class="archive-hero container">
+    <a class="back-link" href="../index.html">&larr; Home</a>
+    <h1>All Write-Ups</h1>
+    <p>Every security write-up, newest first.</p>
   </div>
 </header>
 
-<section style="border-top:none; padding-top:0;">
-  <div class="wrap-wide">
-    <div class="case-grid">
-      <a class="case" href="sentinel-kql-lab.html">
-        <div class="case-eyebrow">CASE-06 &middot; Resolved</div>
-        <div class="case-top"><h3>Home Lab: Sentinel + KQL Detection Engineering</h3></div>
-        <p>SIEM / Detection Engineering / Blue Team</p>
-        <div class="case-tags"><span class="tag">Sentinel</span>
-        <span class="tag">KQL</span>
-        <span class="tag">Detection Engineering</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
+<section class="section-light" style="border-top:none;">
+  <div class="container">
+    <div class="work-list">
+      <a class="work-row" href="sentinel-kql-lab.html">
+        <div class="work-title">Home Lab: Sentinel & KQL Detection Engineering</div>
+        <div class="work-desc">Building a SIEM from nothing, then proving it works by attacking it.</div>
       </a>
 
-      <a class="case" href="relevant.html">
-        <div class="case-eyebrow">CASE-05 &middot; Resolved</div>
-        <div class="case-top"><h3>Relevant</h3></div>
-        <p>SMB Exploitation / Windows Server / Privilege Escalation</p>
-        <div class="case-tags"><span class="tag">SMB</span>
-        <span class="tag">Windows Server</span>
-        <span class="tag">PrintSpoofer</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
+      <a class="work-row" href="relevant.html">
+        <div class="work-title">Relevant</div>
+        <div class="work-desc">An SMB share that turns out to be the same folder as a second, undocumented IIS site.</div>
       </a>
 
-      <a class="case" href="pickle-rick.html">
-        <div class="case-eyebrow">CASE-04 &middot; Resolved</div>
-        <div class="case-top"><h3>Pickle Rick</h3></div>
-        <p>Web Exploitation / Linux Privilege Escalation</p>
-        <div class="case-tags"><span class="tag">Web Exploitation</span>
-        <span class="tag">Filter Bypass</span>
-        <span class="tag">sudo PrivEsc</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
+      <a class="work-row" href="pickle-rick.html">
+        <div class="work-title">Pickle Rick</div>
+        <div class="work-desc">A command panel that filters cat but not tac, and a sudo rule that filters nothing at all.</div>
       </a>
 
-      <a class="case" href="mr-robot.html">
-        <div class="case-eyebrow">CASE-03 &middot; Resolved</div>
-        <div class="case-top"><h3>Mr. Robot CTF</h3></div>
-        <p>Web Exploitation / WordPress / Password Cracking / Linux PrivEsc</p>
-        <div class="case-tags"><span class="tag">WordPress</span>
-        <span class="tag">Password Cracking</span>
-        <span class="tag">SUID PrivEsc</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
+      <a class="work-row" href="mr-robot.html">
+        <div class="work-title">Mr. Robot CTF</div>
+        <div class="work-desc">A deliberately bloated wordlist, a WordPress admin panel, and a SUID nmap binary.</div>
       </a>
 
-      <a class="case" href="endgame-trainer.html">
-        <div class="case-eyebrow">CASE-02 &middot; Resolved</div>
-        <div class="case-top"><h3>Endgame Trainer: Client-Side Checkmate Bypass</h3></div>
-        <p>Web Exploitation / Client-Side Bypass</p>
-        <div class="case-tags"><span class="tag">JavaScript</span>
-        <span class="tag">API Abuse</span>
-        <span class="tag">Web Exploitation</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
+      <a class="work-row" href="endgame-trainer.html">
+        <div class="work-title">Endgame Trainer: Client-Side Checkmate Bypass</div>
+        <div class="work-desc">A chess puzzle that blocks the winning move in the browser — and nowhere else.</div>
       </a>
 
-      <a class="case" href="dns-enumeration.html">
-        <div class="case-eyebrow">CASE-01 &middot; Resolved</div>
-        <div class="case-top"><h3>DNS Enumeration Challenge</h3></div>
-        <p>DNS / Enumeration</p>
-        <div class="case-tags"><span class="tag">DNS</span>
-        <span class="tag">dig</span>
-        <span class="tag">Enumeration</span></div>
-        <div class="case-cta">Read write-up &rarr;</div>
+      <a class="work-row" href="dns-enumeration.html">
+        <div class="work-title">DNS Enumeration Challenge</div>
+        <div class="work-desc">A misconfigured DNS server that answers a basic A-record lookup with the flag itself.</div>
       </a>
 
     </div>
