@@ -3,207 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trent — Cybersecurity Portfolio</title>
+<title>Trent Barber — Cybersecurity Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
-<nav>
-  <div class="wrap">
-    <div class="nav-brand">trent<span>@</span>secops</div>
-    <ul class="nav-links">
-      <li><a href="#capabilities">Capabilities</a></li>
-      <li><a href="#cases">Case Files</a></li>
-      <li><a href="#path">Certification Path</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </div>
-</nav>
+<header class="band-dark">
+  <nav>
+    <div class="container-wide">
+      <div class="wordmark">Trent Barber</div>
+      <ul class="nav-links">
+        <li><a href="#work">Write-Ups</a></li>
+        <li><a href="#background">Background</a></li>
+        <li><a href="#path">Certification Path</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
 
-<header class="hero">
-  <div class="wrap">
-    <div class="hero-panel">
-      <div class="hero-meta">
-        <span><strong>Ticket</strong> #0001</span>
-        <span><strong>Priority</strong> High</span>
-        <span><strong>Status</strong> Open</span>
-        <span><strong>Assigned</strong> Recruiter (you)</span>
-      </div>
-      <h1>Trent Barber</h1>
-      <div class="role">Cybersecurity Student &amp; Aspiring SOC Analyst</div>
-      <p class="summary">
-        Rising senior studying Cybersecurity at the University of South Florida, working toward
-        Security+ certification, with hands-on reverse engineering and malware analysis experience
-        through USF's WhiteHatters Computer Security Club. Building a home lab in Microsoft Sentinel,
-        Defender XDR, and KQL to bridge classroom fundamentals with real SOC tooling.
-      </p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#cases">View case files</a>
-        <a class="btn" href="/resume.pdf">Download resume</a>
-        <a class="btn" href="mailto:trentbarber04@gmail.com">Contact</a>
-      </div>
+  <div class="hero container">
+    <div class="eyebrow-role">Cybersecurity student focused on security operations and detection engineering.</div>
+    <h1>Trent Barber</h1>
+    <p class="bio">
+      Rising senior in Cyber Security at the University of South Florida, working
+      toward a career in SOC analysis and detection engineering. Active in USF's
+      WhiteHatters Computer Security Club, and building hands-on experience with
+      Microsoft Sentinel, KQL, and offensive security tooling outside the classroom.
+    </p>
+    <hr class="hero-rule">
+    <div class="hero-actions">
+      <a class="btn btn-solid" href="/resume.pdf">Resume</a>
+      <a class="btn" href="https://www.linkedin.com/in/trent-barber">LinkedIn</a>
+      <a class="text-link" href="#">GitHub</a>
     </div>
   </div>
 </header>
 
-<section id="capabilities">
-  <div class="wrap">
-    <div class="ticket-bar">
-      <span class="ticket-id">#0002</span>
-      <span class="status-badge status-progress">Reference</span>
-      <span>System Capabilities Inventory</span>
-    </div>
+<section id="work" class="section-light">
+  <div class="container">
     <div class="section-head">
-      <h2>Capabilities</h2>
-      <p>Skills and tools, organized the way a SOC would inventory them — not a decorative skill cloud.</p>
-    </div>
-    <div class="cap-grid">
-      <div class="cap-card">
-        <div class="field">Detection &amp; SIEM</div>
-        <h3>Microsoft Sentinel / Defender XDR</h3>
-        <p>Home-lab build using Azure free tier; analytics rules, incident triage, KQL queries.</p>
-      </div>
-      <div class="cap-card">
-        <div class="field">Query Language</div>
-        <h3>KQL</h3>
-        <p>Log Analytics and Sentinel query writing — auth failures, process creation, network events.</p>
-      </div>
-      <div class="cap-card">
-        <div class="field">Reverse Engineering</div>
-        <h3>Ghidra</h3>
-        <p>Binary analysis for CTF challenges — extracting credentials and unlocking protected files.</p>
-      </div>
-      <div class="cap-card">
-        <div class="field">Malware Analysis</div>
-        <h3>Static / Dynamic Analysis</h3>
-        <p>Lab work on DLL hijacking and credential theft techniques (GINA-based case study).</p>
-      </div>
-      <div class="cap-card">
-        <div class="field">Hardening</div>
-        <h3>DISA STIGs / VMware</h3>
-        <p>Windows hardening portfolio project applying DoD security technical implementation guides.</p>
-      </div>
-      <div class="cap-card">
-        <div class="field">Scripting</div>
-        <h3>Python / PowerShell</h3>
-        <p>Small automations for log parsing, IOC enrichment, and operational tooling.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="cases">
-  <div class="wrap">
-    <div class="ticket-bar">
-      <span class="ticket-id">#0003</span>
-      <span class="status-badge status-resolved">Resolved</span>
-      <span>Recent Case Files</span>
-    </div>
-    <div class="section-head">
-      <h2>Case Files</h2>
-      <p>The three most recent CTF write-ups. Each one is a full room walkthrough on its own page.</p>
+      <h2>Write-Ups</h2>
+      <p>A selection of security work — home-lab detection engineering and CTF exploitation, documented end to end.</p>
     </div>
 
-    <div class="case-grid case-grid-row">
-      <a class="case" href="writeups/sentinel-kql-lab.html">
-        <div class="case-eyebrow">CASE-06 &middot; Resolved</div>
-        <div class="case-top"><h3>Sentinel + KQL Detection Lab</h3></div>
-        <p>SIEM / Detection Engineering / Blue Team</p>
-        <div class="case-tags">
-          <span class="tag">Sentinel</span>
-          <span class="tag">KQL</span>
-          <span class="tag">Detection Engineering</span>
-        </div>
-        <div class="case-cta">Read write-up →</div>
+    <div class="work-list">
+      <a class="work-row" href="writeups/sentinel-kql-lab.html">
+        <div class="work-title">Home Lab: Sentinel &amp; KQL Detection Engineering</div>
+        <div class="work-desc">Built a Microsoft Sentinel SIEM from scratch, simulated an attack with Atomic Red Team, and wrote the KQL rule that caught it.</div>
       </a>
-
-      <a class="case" href="writeups/relevant.html">
-        <div class="case-eyebrow">CASE-05 &middot; Resolved</div>
-        <div class="case-top"><h3>Relevant</h3></div>
-        <p>SMB Exploitation / Windows Server / Privilege Escalation</p>
-        <div class="case-tags">
-          <span class="tag">SMB</span>
-          <span class="tag">Windows Server</span>
-          <span class="tag">PrintSpoofer</span>
-        </div>
-        <div class="case-cta">Read write-up →</div>
+      <a class="work-row" href="writeups/relevant.html">
+        <div class="work-title">Relevant</div>
+        <div class="work-desc">A Windows Server box exploited through a mismapped SMB share and escalated to SYSTEM via PrintSpoofer.</div>
       </a>
-
-      <a class="case" href="writeups/pickle-rick.html">
-        <div class="case-eyebrow">CASE-04 &middot; Resolved</div>
-        <div class="case-top"><h3>Pickle Rick</h3></div>
-        <p>Web Exploitation / Linux Privilege Escalation</p>
-        <div class="case-tags">
-          <span class="tag">Web Exploitation</span>
-          <span class="tag">Filter Bypass</span>
-          <span class="tag">sudo PrivEsc</span>
-        </div>
-        <div class="case-cta">Read write-up →</div>
+      <a class="work-row" href="writeups/pickle-rick.html">
+        <div class="work-title">Pickle Rick</div>
+        <div class="work-desc">Command-panel filter bypass and a misconfigured sudo rule, chained to root on a Linux target.</div>
       </a>
     </div>
 
     <div class="section-footer-action">
-      <a class="btn" href="writeups/index.html">View all case files</a>
+      <a class="text-link" href="writeups/index.html">View all write-ups</a>
     </div>
   </div>
 </section>
 
-<section id="path">
-  <div class="wrap">
-    <div class="ticket-bar">
-      <span class="ticket-id">#0004</span>
-      <span class="status-badge status-progress">In Progress</span>
-      <span>Certification &amp; Education Timeline</span>
+<section id="background" class="section-light">
+  <div class="container">
+    <div class="section-head">
+      <h2>Technical Background</h2>
+      <p>Tools and platforms I've worked with directly, through coursework, CTFs, and self-directed lab work.</p>
     </div>
+    <dl class="def-list">
+      <div class="def-row">
+        <dt>Detection &amp; SIEM</dt>
+        <dd>Microsoft Sentinel, Defender XDR — home-lab log ingestion, analytics rules, and incident triage.</dd>
+      </div>
+      <div class="def-row">
+        <dt>Query &amp; Scripting</dt>
+        <dd>KQL for detection logic; Python and PowerShell for small automation and log-parsing tools.</dd>
+      </div>
+      <div class="def-row">
+        <dt>Offensive Security</dt>
+        <dd>Kali Linux, Metasploit, Nmap, Hydra, SQLMap, Hashcat, FFUF — applied through TryHackMe and HackTheBox.</dd>
+      </div>
+      <div class="def-row">
+        <dt>Forensics &amp; Analysis</dt>
+        <dd>Autopsy, Volatility3, Network Miner, and Eric Zimmerman's tools (KAPE, FTK Imager, Registry Explorer).</dd>
+      </div>
+      <div class="def-row">
+        <dt>Reverse Engineering</dt>
+        <dd>Ghidra — binary analysis for CTF challenges, including credential extraction from compiled binaries.</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section id="path" class="section-light">
+  <div class="container">
     <div class="section-head">
       <h2>Certification Path</h2>
     </div>
     <div class="timeline">
       <div class="tl-item done">
-        <div class="tl-label">Held</div>
-        <h3>Rapid7 InsightAppSec Certified Specialist</h3>
+        <div class="tl-row">
+          <h3>Rapid7 InsightAppSec Certified Specialist</h3>
+          <span class="tl-status">Held — June 2025</span>
+        </div>
         <p>Application security scanning specialist certification.</p>
       </div>
       <div class="tl-item">
-        <div class="tl-label">In Progress</div>
-        <h3>CompTIA Security+</h3>
-        <p>Following a structured 6-week study plan alongside coursework and work schedule.</p>
+        <div class="tl-row">
+          <h3>CompTIA Security+</h3>
+          <span class="tl-status">In progress</span>
+        </div>
+        <p>Following a structured study plan alongside coursework and a part-time work schedule.</p>
       </div>
       <div class="tl-item">
-        <div class="tl-label">Planned Next</div>
-        <h3>BTL1 or eJPT</h3>
-        <p>Hands-on practitioner-level certification, chosen based on which fits the target role better.</p>
+        <div class="tl-row">
+          <h3>BTL1 or eJPT</h3>
+          <span class="tl-status">Planned next</span>
+        </div>
+        <p>Hands-on practitioner certification, chosen based on fit with the target role.</p>
       </div>
       <div class="tl-item">
-        <div class="tl-label">Expected</div>
-        <h3>B.S. Cybersecurity — University of South Florida</h3>
-        <p>Coursework spanning security operations, networks, HCI security, and applied labs.</p>
+        <div class="tl-row">
+          <h3>B.S. Cyber Security — University of South Florida</h3>
+          <span class="tl-status">Expected May 2027</span>
+        </div>
+        <p>Coursework spanning security operations, networks, and applied labs.</p>
       </div>
     </div>
   </div>
 </section>
 
-<footer id="contact">
-  <div class="wrap">
-    <div class="ticket-bar" style="margin-bottom:20px;">
-      <span class="ticket-id">#0005</span>
-      <span class="status-badge status-open">Open</span>
-      <span>Contact</span>
+<footer id="contact" class="band-dark">
+  <div class="container">
+    <div class="footer-head">
+      <h2>Contact</h2>
+      <p>Open to SOC analyst, security operations, and entry-level cybersecurity roles.</p>
     </div>
-    <div class="contact-panel">
-      <p style="max-width:40ch; color:var(--text-dim);">
-        Open to SOC analyst, cybersecurity operations, and entry-level security roles.
-      </p>
-      <div class="contact-links">
-        <a href="mailto:trentbarber04@gmail">Email</a>
-        <a href="https://linkedin.com/in/trent-barber">LinkedIn</a>
-        <a href="https://github.com/aggrulle">GitHub</a>
-      </div>
+    <div class="footer-links">
+      <a href="mailto:trentbarber04@gmail.com">Email</a>
+      <a href="https://www.linkedin.com/in/trent-barber">LinkedIn</a>
+      <a href="#">GitHub</a>
+      <a href="/resume.pdf">Resume</a>
     </div>
-    <p class="foot-note">// last updated 2026-07-21</p>
+    <p class="footer-fine">Trent Barber</p>
   </div>
 </footer>
 
