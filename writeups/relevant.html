@@ -3,67 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Relevant — Case File — Trent</title>
+<title>Relevant — Trent Barber</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 
-<nav>
-  <div class="wrap">
-    <div class="nav-brand">trent<span>@</span>secops</div>
-    <ul class="nav-links">
-      <li><a href="../index.html#capabilities">Capabilities</a></li>
-      <li><a href="../index.html#cases">Case Files</a></li>
-      <li><a href="../index.html#path">Certification Path</a></li>
-      <li><a href="../index.html#contact">Contact</a></li>
-    </ul>
-  </div>
-</nav>
-
-<header class="writeup-header">
-  <div class="wrap">
-    <a class="back-link" href="index.html">&larr; Back to all case files</a>
-    <div class="ticket-bar" style="margin-top:18px;">
-      <span class="ticket-id">CASE-05</span>
-      <span class="status-badge status-resolved">Resolved</span>
-      <span>SMB Exploitation / Windows Server / Privilege Escalation</span>
+<header class="band-dark">
+  <nav>
+    <div class="container-wide">
+      <div class="wordmark">Trent Barber</div>
+      <ul class="nav-links">
+        <li><a href="../index.html#work">Write-Ups</a></li>
+        <li><a href="../index.html#background">Background</a></li>
+        <li><a href="../index.html#path">Certification Path</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
     </div>
+  </nav>
+  <div class="writeup-hero container">
+    <a class="back-link" href="index.html">&larr; All write-ups</a>
     <h1>Relevant</h1>
-    <div class="writeup-meta-grid">
-      <span><strong>Room</strong> TryHackMe — Relevant</span>
-    </div>
-    <div class="case-tags">
-      <span class="tag">SMB</span>
-        <span class="tag">Windows Server</span>
-        <span class="tag">PrintSpoofer</span>
-    </div>
+    <p class="dek">An SMB share that turns out to be the same folder as a second, undocumented IIS site.</p>
+    <p class="meta-line">TryHackMe · SMB Exploitation / Windows Server / Privilege Escalation</p>
   </div>
 </header>
 
-<div class="wrap">
+<div class="container">
   <article class="writeup-body">
-<p><strong>Category:</strong> SMB Exploitation / Windows Server / Privilege Escalation
-<strong>Target:</strong> THM "Relevant" room
-<strong>Objective:</strong> Windows Server 2016 box — get user and root flags</p>
-<p><strong>Open Ports:</strong>
-- 80/tcp — Microsoft IIS httpd 10.0
-- 135/tcp — Microsoft Windows RPC
-- 139/tcp — netbios-ssn
-- 445/tcp — microsoft-ds (Windows Server 2016 Standard Evaluation, build 14393)
-- 3389/tcp — RDP
-- 49663/tcp, 49666/tcp, 49667/tcp — high dynamic RPC/HTTP ports</p>
+<h2>Objective</h2>
+<p>Windows Server 2016 box — get the user and root flags.</p>
+<p><strong>Open ports:</strong></p>
+<ul>
+<li>80/tcp — Microsoft IIS httpd 10.0</li>
+<li>135/tcp — Microsoft Windows RPC</li>
+<li>139/tcp — netbios-ssn</li>
+<li>445/tcp — microsoft-ds (Windows Server 2016 Standard Evaluation, build 14393)</li>
+<li>3389/tcp — RDP</li>
+<li>49663/tcp, 49666/tcp, 49667/tcp — high dynamic RPC/HTTP ports</li>
+</ul>
 <hr />
 <h2>1. Initial Recon</h2>
 <p>Ran a full service scan:</p>
 <pre><code>nmap 10.65.133.232 -sV -sC
 </code></pre>
-<p>Notable findings:
-- IIS 10.0 default site on port 80
-- SMB with <code>message_signing: disabled</code> and <code>account_used: guest</code> in <code>smb-security-mode</code>, suggesting guest/anonymous SMB access might work
-- RDP open with NTLM info revealing hostname "Relevant" and Windows Server 2016 (build 14393)</p>
+<p>Notable findings:</p>
+<ul>
+<li>IIS 10.0 default site on port 80</li>
+<li>SMB with <code>message_signing: disabled</code> and <code>account_used: guest</code> in <code>smb-security-mode</code>, suggesting guest/anonymous SMB access might work</li>
+<li>RDP open with NTLM info revealing hostname "Relevant" and Windows Server 2016 (build 14393)</li>
+</ul>
 <p>A full port sweep (<code>nmap -p- -T4</code>) later revealed three additional high ports not shown by default: <code>49663</code>, <code>49666</code>, <code>49667</code>. The latter two were generic Windows RPC endpoint mapper ports (dead ends). Port <code>49663</code> turned out to be a second IIS site instance — this became central to the exploitation path.</p>
 <h2>2. SMB Enumeration</h2>
 <p>Checked for anonymous/guest SMB share access:</p>
@@ -83,15 +74,19 @@ QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk
 <pre><code>echo &quot;Qm9iIC0gIVBAJCRXMHJEITEyMw==&quot; | base64 -d
 echo &quot;QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk&quot; | base64 -d
 </code></pre>
-<p><strong>Result:</strong>
-- <strong>Bob</strong> — <code>!P@$$W0rD!123</code>
-- <strong>Bill</strong> — <code>Juw4nnaM4n420696969!$$$</code></p>
+<p><strong>Result:</strong></p>
+<ul>
+<li><strong>Bob</strong> — <code>!P@$$W0rD!123</code></li>
+<li><strong>Bill</strong> — <code>Juw4nnaM4n420696969!$$$</code></li>
+</ul>
 <h2>4. Dead Ends (Documented for Reference)</h2>
-<p>Before finding the correct path, several reasonable avenues were tried and ruled out:
-- <strong>WebDAV on ports 80 and 49663</strong> — thoroughly checked via <code>OPTIONS</code>, <code>PROPFIND</code>, <code>cadaver</code>, <code>davtest</code>, and nmap's <code>http-webdav-scan</code>. No DAV support was found on either port; this was a false lead.
-- <strong><code>C$</code> / <code>ADMIN$</code> share access with Bob's credentials</strong> — visible in the share listing, but access was denied on connection, confirming Bob is <em>not</em> a local administrator.
-- <strong><code>impacket-psexec</code></strong> — confirmed <code>nt4wrksv</code> was writable and uploaded a service binary successfully, but failed at the <code>SVCManager</code> step, consistent with Bob lacking admin rights.
-- <strong>RDP with <code>xfreerdp</code></strong> — consistently failed with a TLS-layer "Connection reset by peer" error across multiple security-mode flags. This was ultimately an attackbox/FreeRDP compatibility quirk rather than a real path, and wasn't the intended route regardless.</p>
+<p>Before finding the correct path, several reasonable avenues were tried and ruled out:</p>
+<ul>
+<li><strong>WebDAV on ports 80 and 49663</strong> — thoroughly checked via <code>OPTIONS</code>, <code>PROPFIND</code>, <code>cadaver</code>, <code>davtest</code>, and nmap's <code>http-webdav-scan</code>. No DAV support was found on either port; this was a false lead.</li>
+<li><strong><code>C$</code> / <code>ADMIN$</code> share access with Bob's credentials</strong> — visible in the share listing, but access was denied on connection, confirming Bob is <em>not</em> a local administrator.</li>
+<li><strong><code>impacket-psexec</code></strong> — confirmed <code>nt4wrksv</code> was writable and uploaded a service binary successfully, but failed at the <code>SVCManager</code> step, consistent with Bob lacking admin rights.</li>
+<li><strong>RDP with <code>xfreerdp</code></strong> — consistently failed with a TLS-layer "Connection reset by peer" error across multiple security-mode flags. This was ultimately an attackbox/FreeRDP compatibility quirk rather than a real path, and wasn't the intended route regardless.</li>
+</ul>
 <h2>5. The Actual Path: SMB Share Mapped to IIS Web Root</h2>
 <p>The key insight: <strong>the <code>nt4wrksv</code> SMB share is the same physical folder as a subdirectory of the IIS site running on port 49663</strong> (<code>C:\inetpub\wwwroot\nt4wrksv</code>). Anything uploaded via SMB to that share becomes immediately accessible — and executable, if it's a server-side script — over HTTP at:</p>
 <pre><code>http://10.65.133.232:49663/nt4wrksv/&lt;filename&gt;
@@ -150,11 +145,9 @@ type C:\Users\Administrator\Desktop\root.txt
   </article>
 </div>
 
-<footer>
-  <div class="wrap">
-    <a class="back-link" href="index.html">&larr; Back to all case files</a>
-  </div>
-</footer>
+<div class="writeup-footer container">
+  <a class="text-link" href="index.html">&larr; All write-ups</a>
+</div>
 
 </body>
 </html>

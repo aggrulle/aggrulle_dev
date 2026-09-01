@@ -3,52 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home Lab: Sentinel + KQL Detection Engineering — Case File — Trent</title>
+<title>Home Lab: Sentinel & KQL Detection Engineering — Trent Barber</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 
-<nav>
-  <div class="wrap">
-    <div class="nav-brand">trent<span>@</span>secops</div>
-    <ul class="nav-links">
-      <li><a href="../index.html#capabilities">Capabilities</a></li>
-      <li><a href="../index.html#cases">Case Files</a></li>
-      <li><a href="../index.html#path">Certification Path</a></li>
-      <li><a href="../index.html#contact">Contact</a></li>
-    </ul>
-  </div>
-</nav>
-
-<header class="writeup-header">
-  <div class="wrap">
-    <a class="back-link" href="index.html">&larr; Back to all case files</a>
-    <div class="ticket-bar" style="margin-top:18px;">
-      <span class="ticket-id">CASE-06</span>
-      <span class="status-badge status-resolved">Resolved</span>
-      <span>SIEM / Detection Engineering / Blue Team</span>
+<header class="band-dark">
+  <nav>
+    <div class="container-wide">
+      <div class="wordmark">Trent Barber</div>
+      <ul class="nav-links">
+        <li><a href="../index.html#work">Write-Ups</a></li>
+        <li><a href="../index.html#background">Background</a></li>
+        <li><a href="../index.html#path">Certification Path</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
     </div>
-    <h1>Home Lab: Sentinel + KQL Detection Engineering</h1>
-    <div class="writeup-meta-grid">
-      <span><strong>Room</strong> Personal Home Lab — Microsoft Azure</span>
-    </div>
-    <div class="case-tags">
-      <span class="tag">Sentinel</span>
-        <span class="tag">KQL</span>
-        <span class="tag">Detection Engineering</span>
-    </div>
+  </nav>
+  <div class="writeup-hero container">
+    <a class="back-link" href="index.html">&larr; All write-ups</a>
+    <h1>Home Lab: Sentinel & KQL Detection Engineering</h1>
+    <p class="dek">Building a SIEM from nothing, then proving it works by attacking it.</p>
+    <p class="meta-line">Personal home lab · Microsoft Azure — SIEM / Detection Engineering</p>
   </div>
 </header>
 
-<div class="wrap">
+<div class="container">
   <article class="writeup-body">
-<p><strong>Category:</strong> SIEM / Detection Engineering / Blue Team
-<strong>Environment:</strong> Azure (free tier) — Log Analytics workspace, Microsoft Sentinel, Windows Server VM
-<strong>Objective:</strong> Build a working SOC detection pipeline from scratch — ingest real telemetry, write detection logic in KQL, simulate an attack technique, and confirm the full alert-to-incident workflow — then surface it in a dashboard.</p>
-<hr />
+<h2>Objective</h2>
+<p>Build a working SOC detection pipeline from scratch: ingest real telemetry, write detection logic in KQL, simulate an attack technique, and confirm the full alert-to-incident workflow — then surface it in a dashboard.</p>
 <h2>1. Environment Setup</h2>
 <p>Built the lab entirely on Azure's free tier:</p>
 <ul>
@@ -112,11 +98,9 @@ Invoke-AtomicTest T1136.001
   </article>
 </div>
 
-<footer>
-  <div class="wrap">
-    <a class="back-link" href="index.html">&larr; Back to all case files</a>
-  </div>
-</footer>
+<div class="writeup-footer container">
+  <a class="text-link" href="index.html">&larr; All write-ups</a>
+</div>
 
 </body>
 </html>

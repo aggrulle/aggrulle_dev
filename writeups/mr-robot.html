@@ -3,52 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mr. Robot CTF — Case File — Trent</title>
+<title>Mr. Robot CTF — Trent Barber</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 
-<nav>
-  <div class="wrap">
-    <div class="nav-brand">trent<span>@</span>secops</div>
-    <ul class="nav-links">
-      <li><a href="../index.html#capabilities">Capabilities</a></li>
-      <li><a href="../index.html#cases">Case Files</a></li>
-      <li><a href="../index.html#path">Certification Path</a></li>
-      <li><a href="../index.html#contact">Contact</a></li>
-    </ul>
-  </div>
-</nav>
-
-<header class="writeup-header">
-  <div class="wrap">
-    <a class="back-link" href="index.html">&larr; Back to all case files</a>
-    <div class="ticket-bar" style="margin-top:18px;">
-      <span class="ticket-id">CASE-03</span>
-      <span class="status-badge status-resolved">Resolved</span>
-      <span>Web Exploitation / WordPress / Password Cracking / Linux PrivEsc</span>
+<header class="band-dark">
+  <nav>
+    <div class="container-wide">
+      <div class="wordmark">Trent Barber</div>
+      <ul class="nav-links">
+        <li><a href="../index.html#work">Write-Ups</a></li>
+        <li><a href="../index.html#background">Background</a></li>
+        <li><a href="../index.html#path">Certification Path</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
     </div>
+  </nav>
+  <div class="writeup-hero container">
+    <a class="back-link" href="index.html">&larr; All write-ups</a>
     <h1>Mr. Robot CTF</h1>
-    <div class="writeup-meta-grid">
-      <span><strong>Room</strong> TryHackMe — Mr. Robot CTF</span>
-    </div>
-    <div class="case-tags">
-      <span class="tag">WordPress</span>
-        <span class="tag">Password Cracking</span>
-        <span class="tag">SUID PrivEsc</span>
-    </div>
+    <p class="dek">A deliberately bloated wordlist, a WordPress admin panel, and a SUID nmap binary.</p>
+    <p class="meta-line">TryHackMe · WordPress / Password Cracking / Linux Privilege Escalation</p>
   </div>
 </header>
 
-<div class="wrap">
+<div class="container">
   <article class="writeup-body">
-<p><strong>Category:</strong> Web Exploitation / WordPress / Password Cracking / Linux Privilege Escalation
-<strong>Target:</strong> THM "Mr. Robot CTF" room
-<strong>Objective:</strong> Find three hidden keys, themed around the Mr. Robot TV series</p>
-<hr />
+<h2>Objective</h2>
+<p>Find three hidden keys planted across the box, themed around the Mr. Robot TV series.</p>
 <h2>1. Initial Recon</h2>
 <p>Scanned the target and found HTTP, HTTPS, and SSH ports. Browsing to the site revealed a generic-looking landing page.</p>
 <p>Checked <code>robots.txt</code>:</p>
@@ -56,9 +42,11 @@
 fsocity.dic
 key-1-of-3.txt
 </code></pre>
-<p>This immediately handed over two things:
-- <strong>Key #1</strong> — read directly from <code>key-1-of-3.txt</code>.
-- <strong><code>fsocity.dic</code></strong> — a large custom wordlist, clearly meant to be used later.</p>
+<p>This immediately handed over two things:</p>
+<ul>
+<li><strong>Key #1</strong> — read directly from <code>key-1-of-3.txt</code>.</li>
+<li><strong><code>fsocity.dic</code></strong> — a large custom wordlist, clearly meant to be used later.</li>
+</ul>
 <h2>2. Finding the Login Page</h2>
 <p>Browsing further on the site led to a WordPress login page (<code>wp-login.php</code>), running WordPress 4.3.1.</p>
 <h2>3. The "Fishy" Wordlist</h2>
@@ -149,11 +137,9 @@ cat /root/key-3-of-3.txt
   </article>
 </div>
 
-<footer>
-  <div class="wrap">
-    <a class="back-link" href="index.html">&larr; Back to all case files</a>
-  </div>
-</footer>
+<div class="writeup-footer container">
+  <a class="text-link" href="index.html">&larr; All write-ups</a>
+</div>
 
 </body>
 </html>
